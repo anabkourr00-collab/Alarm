@@ -1,0 +1,1017 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Reminder Pro</title>
+    <meta name="theme-color" content="#6d28d9">
+    
+    <link rel="manifest" href="manifest.json">
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+    
+    <style>
+        :root {
+            --bg: #0f172a;
+            --card: #1e293b;
+            --card-hover: #273449;
+            --primary: #7c3aed;
+            --primary-hover: #6d28d9;
+            --text: #ffffff;
+            --muted: #94a3b8;
+            --border: #334155;
+            --danger: #ef4444;
+            --success: #22c55e;
+            --warning: #f59e0b;
+            --shadow: 0 10px 25px rgba(0,0,0,.25);
+            --radius: 18px;
+        }
+
+        body.light {
+            --bg: #f5f7fb;
+            --card: #ffffff;
+            --card-hover: #f1f5f9;
+            --text: #0f172a;
+            --muted: #64748b;
+            --border: #dbe2ea;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Cairo', sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            min-height: 100vh;
+            transition: .3s;
+        }
+
+        .app {
+            width: min(100%, 900px);
+            margin: auto;
+            padding: 20px;
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 25px;
+        }
+
+        .header h1 {
+            font-size: 2rem;
+            font-weight: 800;
+        }
+
+        .header p {
+            color: var(--muted);
+            margin-top: 5px;
+        }
+
+        .icon-btn {
+            border: none;
+            background: var(--card);
+            color: var(--text);
+            width: 52px;
+            height: 52px;
+            border-radius: 50%;
+            cursor: pointer;
+            font-size: 20px;
+            box-shadow: var(--shadow);
+        }
+
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 15px;
+            margin-bottom: 25px;
+        }
+
+        .stat-card {
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            text-align: center;
+            padding: 18px;
+            box-shadow: var(--shadow);
+        }
+
+        .stat-card span {
+            display: block;
+            font-size: 1.7rem;
+            font-weight: 800;
+        }
+
+        .stat-card small {
+            color: var(--muted);
+        }
+
+        .add-section,
+        .search-section,
+        .filters,
+        .bottom-actions {
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 18px;
+            margin-bottom: 20px;
+            box-shadow: var(--shadow);
+        }
+
+        .add-section h2 {
+            margin-bottom: 15px;
+        }
+
+        textarea,
+        input,
+        select {
+            width: 100%;
+            border: none;
+            outline: none;
+            padding: 14px;
+            border-radius: 14px;
+            background: rgba(255,255,255,.06);
+            color: var(--text);
+            border: 1px solid var(--border);
+            margin-top: 10px;
+        }
+
+        textarea {
+            min-height: 120px;
+            resize: vertical;
+        }
+
+        .row {
+            margin-top: 10px;
+        }
+
+        .primary-btn {
+            width: 100%;
+            border: none;
+            padding: 14px;
+            margin-top: 15px;
+            border-radius: 14px;
+            background: var(--primary);
+            color: white;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: 700;
+        }
+
+        .primary-btn:hover {
+            background: var(--primary-hover);
+        }
+
+        .filters {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .filter-btn {
+            flex: 1;
+            min-width: 100px;
+            border: none;
+            padding: 12px;
+            border-radius: 12px;
+            cursor: pointer;
+            background: rgba(255,255,255,.08);
+            color: var(--text);
+        }
+
+        .filter-btn.active {
+            background: var(--primary);
+            color: white;
+        }
+
+        #remindersContainer {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .reminder-card {
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 18px;
+            box-shadow: var(--shadow);
+            transition: .25s;
+        }
+
+        .reminder-card:hover {
+            transform: translateY(-2px);
+            background: var(--card-hover);
+        }
+
+        .reminder-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .reminder-message {
+            font-size: 1rem;
+            font-weight: 700;
+            line-height: 1.6;
+        }
+
+        .reminder-date {
+            margin-top: 10px;
+            color: var(--muted);
+            font-size: .9rem;
+        }
+
+        .reminder-actions {
+            display: flex;
+            gap: 8px;
+            margin-top: 15px;
+        }
+
+        .action-btn {
+            border: none;
+            padding: 10px 14px;
+            border-radius: 10px;
+            cursor: pointer;
+            color: white;
+        }
+
+        .edit-btn {
+            background: #3b82f6;
+        }
+
+        .done-btn {
+            background: var(--success);
+        }
+
+        .delete-btn {
+            background: var(--danger);
+        }
+
+        .priority {
+            display: inline-block;
+            padding: 5px 10px;
+            border-radius: 999px;
+            font-size: .8rem;
+            margin-top: 10px;
+        }
+
+        .priority.low {
+            background: #14532d;
+        }
+
+        .priority.medium {
+            background: #854d0e;
+        }
+
+        .priority.high {
+            background: #7f1d1d;
+        }
+
+        #emptyState {
+            text-align: center;
+        }
+
+        .empty-box {
+            background: var(--card);
+            border: 1px dashed var(--border);
+            border-radius: var(--radius);
+            padding: 40px 20px;
+        }
+
+        .empty-box p {
+            margin-top: 10px;
+            color: var(--muted);
+        }
+
+        .bottom-actions {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .bottom-actions button {
+            flex: 1;
+            border: none;
+            padding: 12px;
+            border-radius: 12px;
+            cursor: pointer;
+            background: var(--primary);
+            color: white;
+        }
+
+        .modal {
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,.6);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+            z-index: 999;
+        }
+
+        .modal.show {
+            display: flex;
+        }
+
+        .modal-content {
+            width: min(100%, 500px);
+            background: var(--card);
+            border-radius: 20px;
+            padding: 20px;
+            border: 1px solid var(--border);
+        }
+
+        .modal-content h2 {
+            margin-bottom: 15px;
+        }
+
+        .modal-buttons {
+            display: flex;
+            gap: 10px;
+            margin-top: 15px;
+        }
+
+        .modal-buttons button {
+            flex: 1;
+            border: none;
+            padding: 12px;
+            border-radius: 12px;
+            cursor: pointer;
+        }
+
+        #saveEditBtn {
+            background: var(--success);
+            color: white;
+        }
+
+        #cancelEditBtn {
+            background: var(--danger);
+            color: white;
+        }
+
+        .completed {
+            opacity: .65;
+        }
+
+        .completed .reminder-message {
+            text-decoration: line-through;
+        }
+
+        @media(max-width: 700px) {
+            .stats {
+                grid-template-columns: 1fr;
+            }
+
+            .header {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+
+            .bottom-actions {
+                flex-direction: column;
+            }
+
+            .filter-btn {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<div class="app">
+    <!-- Header -->
+    <header class="header">
+        <div class="header-left">
+            <h1>🔔 Reminder Pro</h1>
+            <p>نظم تذكيراتك بسهولة</p>
+        </div>
+        <div class="header-actions">
+            <button id="themeBtn" class="icon-btn">🌙</button>
+        </div>
+    </header>
+
+    <!-- Statistics -->
+    <section class="stats">
+        <div class="stat-card">
+            <span id="totalCount">0</span>
+            <small>إجمالي</small>
+        </div>
+        <div class="stat-card">
+            <span id="activeCount">0</span>
+            <small>قادمة</small>
+        </div>
+        <div class="stat-card">
+            <span id="doneCount">0</span>
+            <small>منتهية</small>
+        </div>
+    </section>
+
+    <!-- Add Reminder -->
+    <section class="add-section">
+        <h2>إضافة تذكير</h2>
+        <textarea id="messageInput" placeholder="اكتب التذكير هنا..."></textarea>
+        <div class="row">
+            <input type="datetime-local" id="dateInput">
+        </div>
+        <div class="row">
+            <select id="priorityInput">
+                <option value="low">منخفضة</option>
+                <option value="medium" selected>متوسطة</option>
+                <option value="high">عالية</option>
+            </select>
+        </div>
+        <button id="addReminderBtn" class="primary-btn">➕ إضافة التذكير</button>
+    </section>
+
+    <!-- Search -->
+    <section class="search-section">
+        <input type="text" id="searchInput" placeholder="بحث...">
+    </section>
+
+    <!-- Filters -->
+    <section class="filters">
+        <button class="filter-btn active" data-filter="all">الكل</button>
+        <button class="filter-btn" data-filter="active">القادمة</button>
+        <button class="filter-btn" data-filter="completed">المنتهية</button>
+    </section>
+
+    <!-- Reminder List -->
+    <section id="remindersContainer"></section>
+
+    <!-- Empty State -->
+    <section id="emptyState">
+        <div class="empty-box">
+            <h3>لا توجد تذكيرات</h3>
+            <p>أضف أول تذكير للبدء</p>
+        </div>
+    </section>
+
+    <!-- Bottom Actions -->
+    <section class="bottom-actions">
+        <button id="exportBtn">📤 تصدير</button>
+        <button id="importBtn">📥 استيراد</button>
+        <button id="clearAllBtn">🗑 حذف الكل</button>
+        <input type="file" id="importFile" accept=".json" hidden>
+    </section>
+</div>
+
+<!-- Edit Modal -->
+<div id="editModal" class="modal">
+    <div class="modal-content">
+        <h2>تعديل التذكير</h2>
+        <textarea id="editMessage"></textarea>
+        <input type="datetime-local" id="editDate">
+        <select id="editPriority">
+            <option value="low">منخفضة</option>
+            <option value="medium">متوسطة</option>
+            <option value="high">عالية</option>
+        </select>
+        <div class="modal-buttons">
+            <button id="saveEditBtn">حفظ</button>
+            <button id="cancelEditBtn">إلغاء</button>
+        </div>
+    </div>
+</div>
+
+<audio id="alarmSound">
+    <source src="alarm.mp3" type="audio/mpeg">
+</audio>
+
+<script>
+    // =========================
+    // Elements
+    // =========================
+    const messageInput = document.getElementById("messageInput");
+    const dateInput = document.getElementById("dateInput");
+    const priorityInput = document.getElementById("priorityInput");
+    const addReminderBtn = document.getElementById("addReminderBtn");
+    const remindersContainer = document.getElementById("remindersContainer");
+    const emptyState = document.getElementById("emptyState");
+    const totalCount = document.getElementById("totalCount");
+    const activeCount = document.getElementById("activeCount");
+    const doneCount = document.getElementById("doneCount");
+
+    // =========================
+    // Data
+    // =========================
+    let reminders = JSON.parse(localStorage.getItem("reminders")) || [];
+
+    // =========================
+    // Save
+    // =========================
+    function saveReminders() {
+        localStorage.setItem("reminders", JSON.stringify(reminders));
+    }
+
+    // =========================
+    // Stats
+    // =========================
+    function updateStats() {
+        totalCount.textContent = reminders.length;
+        activeCount.textContent = reminders.filter(r => !r.completed).length;
+        doneCount.textContent = reminders.filter(r => r.completed).length;
+    }
+
+    // =========================
+    // Priority Label
+    // =========================
+    function getPriorityText(priority) {
+        if (priority === "high") return "عالية";
+        if (priority === "medium") return "متوسطة";
+        return "منخفضة";
+    }
+
+    // =========================
+    // Delete Reminder
+    // =========================
+    function deleteReminder(id) {
+        if (!confirm("حذف التذكير؟")) return;
+        reminders = reminders.filter(r => r.id !== id);
+        saveReminders();
+        renderReminders();
+    }
+
+    // =========================
+    // Toggle Completed
+    // =========================
+    function toggleCompleted(id) {
+        const reminder = reminders.find(r => r.id === id);
+        if (!reminder) return;
+        reminder.completed = !reminder.completed;
+        saveReminders();
+        renderReminders();
+    }
+
+    // =========================
+    // Render
+    // =========================
+    function renderReminders() {
+        remindersContainer.innerHTML = "";
+
+        if (reminders.length === 0) {
+            emptyState.style.display = "block";
+        } else {
+            emptyState.style.display = "block";
+        }
+
+        reminders.forEach(reminder => {
+            const card = document.createElement("div");
+            card.className = reminder.completed ? "reminder-card completed" : "reminder-card";
+
+            card.innerHTML = `
+                <div class="reminder-top">
+                    <div class="reminder-message">${reminder.message}</div>
+                </div>
+                <div class="reminder-date">📅 ${new Date(reminder.date).toLocaleString("ar-EG")}</div>
+                <div class="priority ${reminder.priority}">${getPriorityText(reminder.priority)}</div>
+                <div class="reminder-actions">
+                    <button class="action-btn done-btn" onclick="toggleCompleted(${reminder.id})">${reminder.completed ? "إلغاء" : "تم"}</button>
+                    <button class="action-btn edit-btn" onclick="openEditModal(${reminder.id})">تعديل</button>
+                    <button class="action-btn delete-btn" onclick="deleteReminder(${reminder.id})">حذف</button>
+                </div>
+            `;
+
+            remindersContainer.appendChild(card);
+        });
+
+        updateStats();
+    }
+
+    // =========================
+    // Add Reminder
+    // =========================
+    addReminderBtn.addEventListener("click", () => {
+        const message = messageInput.value.trim();
+        const date = dateInput.value;
+        const priority = priorityInput.value;
+
+        if (!message || !date) {
+            alert("أدخل البيانات كاملة");
+            return;
+        }
+
+        reminders.push({
+            id: Date.now(),
+            message,
+            date,
+            priority,
+            completed: false,
+            createdAt: new Date().toISOString()
+        });
+
+        saveReminders();
+        renderReminders();
+        messageInput.value = "";
+        dateInput.value = "";
+    });
+
+    // =========================
+    // First Render
+    // =========================
+    renderReminders();
+
+    // =========================
+    // Search
+    // =========================
+    const searchInput = document.getElementById("searchInput");
+    let currentFilter = "all";
+
+    searchInput.addEventListener("input", () => {
+        renderReminders();
+    });
+
+    // =========================
+    // Filters
+    // =========================
+    const filterButtons = document.querySelectorAll(".filter-btn");
+
+    filterButtons.forEach(btn => {
+        btn.addEventListener("click", () => {
+            filterButtons.forEach(b => b.classList.remove("active"));
+            btn.classList.add("active");
+            currentFilter = btn.dataset.filter;
+            renderReminders();
+        });
+    });
+
+    // =========================
+    // Edit Modal Elements
+    // =========================
+    const editModal = document.getElementById("editModal");
+    const editMessage = document.getElementById("editMessage");
+    const editDate = document.getElementById("editDate");
+    const editPriority = document.getElementById("editPriority");
+    const saveEditBtn = document.getElementById("saveEditBtn");
+    const cancelEditBtn = document.getElementById("cancelEditBtn");
+    let editingId = null;
+
+    // =========================
+    // Open Edit Modal
+    // =========================
+    function openEditModal(id) {
+        const reminder = reminders.find(r => r.id === id);
+        if (!reminder) return;
+
+        editingId = id;
+        editMessage.value = reminder.message;
+        editDate.value = reminder.date;
+        editPriority.value = reminder.priority;
+        editModal.classList.add("show");
+    }
+
+    // =========================
+    // Close Modal
+    // =========================
+    function closeEditModal() {
+        editModal.classList.remove("show");
+        editingId = null;
+    }
+
+    cancelEditBtn.addEventListener("click", closeEditModal);
+
+    // =========================
+    // Save Edit
+    // =========================
+    saveEditBtn.addEventListener("click", () => {
+        if (editingId === null) return;
+
+        const reminder = reminders.find(r => r.id === editingId);
+        if (!reminder) return;
+
+        reminder.message = editMessage.value.trim();
+        reminder.date = editDate.value;
+        reminder.priority = editPriority.value;
+
+        saveReminders();
+        renderReminders();
+        closeEditModal();
+    });
+
+    // =========================
+    // Render With Search And Filters
+    // =========================
+    const originalRender = renderReminders;
+
+    renderReminders = function() {
+        remindersContainer.innerHTML = "";
+        let filtered = [...reminders];
+
+        const keyword = searchInput.value.trim().toLowerCase();
+        if (keyword) {
+            filtered = filtered.filter(r => r.message.toLowerCase().includes(keyword));
+        }
+
+        if (currentFilter === "active") {
+            filtered = filtered.filter(r => !r.completed);
+        }
+
+        if (currentFilter === "completed") {
+            filtered = filtered.filter(r => r.completed);
+        }
+
+        if (filtered.length === 0) {
+            emptyState.style.display = "block";
+        } else {
+            emptyState.style.display = "none";
+        }
+
+        filtered.forEach(reminder => {
+            const card = document.createElement("div");
+            card.className = reminder.completed ? "reminder-card completed" : "reminder-card";
+
+            card.innerHTML = `
+                <div class="reminder-top">
+                    <div class="reminder-message">${reminder.message}</div>
+                </div>
+                <div class="reminder-date">📅 ${new Date(reminder.date).toLocaleString("ar-EG")}</div>
+                <div class="priority ${reminder.priority}">${getPriorityText(reminder.priority)}</div>
+                <div class="reminder-actions">
+                    <button class="action-btn done-btn" onclick="toggleCompleted(${reminder.id})">${reminder.completed ? "إلغاء" : "تم"}</button>
+                    <button class="action-btn edit-btn" onclick="openEditModal(${reminder.id})">تعديل</button>
+                    <button class="action-btn delete-btn" onclick="deleteReminder(${reminder.id})">حذف</button>
+                </div>
+            `;
+
+            remindersContainer.appendChild(card);
+        });
+
+        updateStats();
+    };
+
+    // =========================
+    // Close Modal On Background Click
+    // =========================
+    editModal.addEventListener("click", e => {
+        if (e.target === editModal) {
+            closeEditModal();
+        }
+    });
+
+    // =========================
+    // Theme (Dark / Light)
+    // =========================
+    const themeBtn = document.getElementById("themeBtn");
+    const savedTheme = localStorage.getItem("theme");
+
+    if (savedTheme === "light") {
+        document.body.classList.add("light");
+        themeBtn.textContent = "☀️";
+    } else {
+        themeBtn.textContent = "🌙";
+    }
+
+    themeBtn.addEventListener("click", () => {
+        document.body.classList.toggle("light");
+        const isLight = document.body.classList.contains("light");
+
+        if (isLight) {
+            localStorage.setItem("theme", "light");
+            themeBtn.textContent = "☀️";
+        } else {
+            localStorage.setItem("theme", "dark");
+            themeBtn.textContent = "🌙";
+        }
+    });
+
+    // =========================
+    // Export JSON
+    // =========================
+    const exportBtn = document.getElementById("exportBtn");
+
+    exportBtn.addEventListener("click", () => {
+        const data = JSON.stringify(reminders, null, 2);
+        const blob = new Blob([data], { type: "application/json" });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = "reminders-backup.json";
+        a.click();
+        URL.revokeObjectURL(url);
+    });
+
+    // =========================
+    // Import JSON
+    // =========================
+    const importBtn = document.getElementById("importBtn");
+    const importFile = document.getElementById("importFile");
+
+    importBtn.addEventListener("click", () => {
+        importFile.click();
+    });
+
+    importFile.addEventListener("change", e => {
+        const file = e.target.files[0];
+        if (!file) return;
+
+        const reader = new FileReader();
+        reader.onload = event => {
+            try {
+                const imported = JSON.parse(event.target.result);
+                if (!Array.isArray(imported)) {
+                    throw new Error();
+                }
+                reminders = imported;
+                saveReminders();
+                renderReminders();
+                alert("تم الاستيراد بنجاح");
+            } catch {
+                alert("ملف غير صالح");
+            }
+        };
+        reader.readAsText(file);
+    });
+
+    // =========================
+    // Delete All
+    // =========================
+    const clearAllBtn = document.getElementById("clearAllBtn");
+
+    clearAllBtn.addEventListener("click", () => {
+        if (!confirm("حذف جميع التذكيرات؟")) return;
+        reminders = [];
+        saveReminders();
+        renderReminders();
+    });
+
+    // =========================
+    // Auto Save Protection
+    // =========================
+    window.addEventListener("beforeunload", () => {
+        saveReminders();
+    });
+
+    // =========================
+    // Sort By Date
+    // =========================
+    function sortReminders() {
+        reminders.sort((a, b) => {
+            return new Date(a.date) - new Date(b.date);
+        });
+    }
+
+    const oldRender = renderReminders;
+
+    renderReminders = function() {
+        sortReminders();
+        oldRender();
+    };
+
+    // =========================
+    // First Refresh
+    // =========================
+    renderReminders();
+
+    // =========================
+    // Notifications
+    // =========================
+    const alarmSound = document.getElementById("alarmSound");
+
+    if ("Notification" in window) {
+        Notification.requestPermission();
+    }
+
+    // =========================
+    // Notify
+    // =========================
+    function showReminderNotification(reminder) {
+        if (Notification.permission === "granted") {
+            new Notification("🔔 تذكير", {
+                body: reminder.message,
+                icon: "icon-192.png"
+            });
+        }
+    }
+
+    // =========================
+    // Alarm Sound
+    // =========================
+    function playAlarm() {
+        if (!alarmSound) return;
+        alarmSound.currentTime = 0;
+        alarmSound.play().catch(() => {});
+    }
+
+    // =========================
+    // Remaining Time
+    // =========================
+    function getRemainingText(targetDate) {
+        const diff = new Date(targetDate) - new Date();
+
+        if (diff <= 0) {
+            return "انتهى الموعد";
+        }
+
+        const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+        const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+        const mins = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+
+        if (days > 0) {
+            return `${days} يوم ${hours} ساعة`;
+        }
+
+        if (hours > 0) {
+            return `${hours} ساعة ${mins} دقيقة`;
+        }
+
+        return `${mins} دقيقة`;
+    }
+
+    // =========================
+    // Notification Check
+    // =========================
+    function checkReminders() {
+        const now = new Date().getTime();
+
+        reminders.forEach(reminder => {
+            if (reminder.completed) return;
+            if (reminder.notified) return;
+
+            const target = new Date(reminder.date).getTime();
+
+            if (now >= target) {
+                reminder.notified = true;
+                saveReminders();
+                showReminderNotification(reminder);
+                playAlarm();
+                renderReminders();
+            }
+        });
+    }
+
+    // =========================
+    // Live Counter Update
+    // =========================
+    const previousRender = renderReminders;
+
+    renderReminders = function() {
+        remindersContainer.innerHTML = "";
+        let filtered = [...reminders];
+
+        const keyword = searchInput.value.trim().toLowerCase();
+        if (keyword) {
+            filtered = filtered.filter(r => r.message.toLowerCase().includes(keyword));
+        }
+
+        if (currentFilter === "active") {
+            filtered = filtered.filter(r => !r.completed);
+        }
+
+        if (currentFilter === "completed") {
+            filtered = filtered.filter(r => r.completed);
+        }
+
+        emptyState.style.display = filtered.length ? "none" : "block";
+
+        filtered.forEach(reminder => {
+            const card = document.createElement("div");
+            card.className = reminder.completed ? "reminder-card completed" : "reminder-card";
+
+            card.innerHTML = `
+                <div class="reminder-top">
+                    <div class="reminder-message">${reminder.message}</div>
+                </div>
+                <div class="reminder-date">📅 ${new Date(reminder.date).toLocaleString("ar-EG")}</div>
+                <div class="reminder-date">⏳ ${getRemainingText(reminder.date)}</div>
+                <div class="priority ${reminder.priority}">${getPriorityText(reminder.priority)}</div>
+                <div class="reminder-actions">
+                    <button class="action-btn done-btn" onclick="toggleCompleted(${reminder.id})">${reminder.completed ? "إلغاء" : "تم"}</button>
+                    <button class="action-btn edit-btn" onclick="openEditModal(${reminder.id})">تعديل</button>
+                    <button class="action-btn delete-btn" onclick="deleteReminder(${reminder.id})">حذف</button>
+                </div>
+            `;
+
+            remindersContainer.appendChild(card);
+        });
+
+        updateStats();
+    };
+
+    // =========================
+    // Auto Refresh
+    // =========================
+    setInterval(() => {
+        checkReminders();
+        renderReminders();
+    }, 1000);
+
+    // =========================
+    // First Check
+    // =========================
+    checkReminders();
+    renderReminders();
+</script>
+
+</body>
+  </html>
